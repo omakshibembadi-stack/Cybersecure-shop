@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="bg-dark text-warning rounded-circle d-inline-flex p-3 mb-2 shadow-sm">
+                        <i class="bi bi-shield-lock-fill fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Administrator Portal</h3>
+                    <p class="text-muted small">Restricted access for system administrators</p>
+                </div>
+
+                <form action="{{ url_for('admin.admin_login') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="username">Admin Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="e.g. admin" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" for="password">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Admin Console
+                    </button>
+                </form>
+
+                <div class="alert alert-light border mt-4 mb-0 py-2 small text-muted">
+                    <i class="bi bi-info-circle text-primary me-1"></i>
+                    <strong>Lab Credentials:</strong> <code>admin</code> / <code>AdminPass123!</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

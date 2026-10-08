@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-receipt text-primary me-2"></i>My Order History</h2>
+        <p class="text-muted mb-0">View all past orders and transaction receipts.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('public.products') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-cart-plus me-1"></i> Continue Shopping
+        </a>
+    </div>
+</div>
+
+{% if orders %}
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="ps-3 py-3">Order ID</th>
+                    <th scope="col" class="py-3">Date</th>
+                    <th scope="col" class="py-3">Shipping Address</th>
+                    <th scope="col" class="py-3">Status</th>
+                    <th scope="col" class="py-3">Total Amount</th>
+                    <th scope="col" class="py-3 text-end pe-3">Receipt / Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td class="ps-3 fw-bold">#{{ order.id }}</td>
+                    <td class="text-muted small">{{ order.created_at }}</td>
+                    <td class="text-truncate" style="max-width: 250px;">{{ order.shipping_address }}</td>
+                    <td>
+                        <span class="badge {{ 'bg-success' if order.status == 'Delivered' else ('bg-info text-dark' if order.status == 'Shipped' else 'bg-warning text-dark') }}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td class="fw-bold text-dark">${{ "%.2f"|format(order.total_amount) }}</td>
+                    <td class="text-end pe-3">
+                        <a href="{{ url_for('user.order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-eye me-1"></i> View Receipt
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5 bg-white rounded-3 shadow-sm border p-5">
+    <div class="display-4 text-muted mb-3"><i class="bi bi-bag-x"></i></div>
+    <h4>No orders recorded yet</h4>
+    <p class="text-muted mb-3">Browse our store and make your first secure hardware purchase.</p>
+    <a href="{{ url_for('public.products') }}" class="btn btn-primary">Browse Catalogue</a>
+</div>
+{% endif %}
+{% endblock %}

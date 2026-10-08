@@ -1,0 +1,100 @@
+===========================================================================
+  SECURESHOP RED TEAM AUTOMATED AUDIT & VERIFICATION RESULTS
+  Target: http://127.0.0.1:5000 | Date: 2026-10-08
+===========================================================================
+
+PHASE 1: LIVE SERVER HEALTH & BASELINE MODE VERIFICATION
+[+] Server responded with HTTP 200
+[+] Verified Active Mode: [VULNERABLE BASELINE]
+
+PHASE 2: DAST SCANNING (OWASP ZAP METHODOLOGY)
+[*] Spider crawling essential application endpoints...
+    [Spider] /                    -> HTTP 200
+    [Spider] /products            -> HTTP 200
+    [Spider] /search?q=test       -> HTTP 200
+    [Spider] /product/1           -> HTTP 200
+    [Spider] /cart                -> HTTP 200
+    [Spider] /login               -> HTTP 200
+    [Spider] /register            -> HTTP 200
+    [Spider] /admin/login         -> HTTP 200
+
+[*] Evaluating HTTP Security Headers & Information Disclosure (Passive Scan):
+    [!] Server Header: Werkzeug/2.2.2 Python/3.14 (Vulnerable-Lab-Server)
+    [!] X-Frame-Options: None (Clickjacking Vulnerability!)
+    [!] X-Content-Type-Options: None (MIME Confusion Vulnerability!)
+    [!] Content-Security-Policy: None (No CSP Enforcement!)
+
+PHASE 3: CONTROLLED EXPLOIT VALIDATION (VULNERABLE MODE)
+[*] 3A. Testing A03 Injection: SQL Injection in /search?q=
+    [+] SUCCESSFUL EXPLOIT (Tautology): Returned all catalog products matching '' OR '1'='1'!
+
+[*] 3B. Authenticating as Customer Alice (alice / AlicePass456!)...
+    [+] Authentication Successful. Session established.
+    [!] Inspecting Session Cookie Security (A07):
+        -> Cookie Object: {'session': 'eyJyb2xlIjoiY3VzdG9tZXIiLCJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImFsaWNlIn0...'}
+
+[*] 3C. Testing A01 Broken Access Control: IDOR on /profile/3 (Bob's Profile)...
+    [+] SUCCESSFUL EXPLOIT (Profile IDOR): Customer Alice accessed Bob's private profile!
+        -> Extracted Email: bob@secureshop.local
+        -> Extracted Bio: 'DevOps engineer looking for secure authentication hardware.'
+
+[*] 3D. Testing A01 Broken Access Control: IDOR on /order/102 (Bob's Order Invoice)...
+    [+] SUCCESSFUL EXPLOIT (Order IDOR): Customer Alice accessed Bob's order invoice!
+        -> Extracted Shipping Address: '108 Binary Blvd, Cyberspace, NY 10001'
+        -> Extracted Order Total: $179.45
+
+[*] 3E. Testing A01 Admin Privilege Bypass: Accessing /admin/dashboard as Customer Alice...
+    [+] SUCCESSFUL EXPLOIT (Admin Bypass): Customer Alice gained access to Administrator Dashboard!
+        -> Accessible: Gross Sales Metrics, Inventory Controls, User Management
+
+[*] 3F. Testing A05 Security Misconfiguration: Accessing /debug/error...
+    [+] SUCCESSFUL EXPLOIT (Information Disclosure): Werkzeug interactive debugger traceback triggered!
+
+PHASE 4: APPLYING REMEDIATION & SWITCHING TO SECURE MODE
+[*] Triggering security posture switch to SECURE MODE via /toggle-mode...
+[+] Application Successfully Hardened: Active Mode is now [SECURE]
+
+PHASE 5: RETESTING & VERIFYING DEFENSIVE REMEDIATIONS
+[*] 5A. Retesting SQL Injection in /search?q=
+    [+] DEFENSE VERIFIED: Tautology payload '' OR '1'='1' safely neutralized by parameterized query!
+        -> Output: 'No products found matching your search term' (0 records returned)
+
+[*] 5B. Retesting IDOR on /profile/3 as Customer Alice...
+    -> Server Response: HTTP 403
+    [+] DEFENSE VERIFIED: IDOR attempt strictly BLOCKED with HTTP 403 Forbidden!
+
+[*] 5C. Retesting IDOR on /order/102 as Customer Alice...
+    -> Server Response: HTTP 403
+    [+] DEFENSE VERIFIED: Order invoice IDOR strictly BLOCKED with HTTP 403 Forbidden!
+
+[*] 5D. Retesting Admin Access /admin/dashboard as Customer Alice...
+    -> Server Response: HTTP 403
+    [+] DEFENSE VERIFIED: Admin area strictly BLOCKED with HTTP 403 Forbidden!
+
+[*] 5E. Retesting HTTP Security Headers (Defensive Middleware)...
+    [+] X-Frame-Options:        DENY (Clickjacking Defended)
+    [+] X-Content-Type-Options: nosniff (MIME Sniffing Defended)
+    [+] Content-Security-Policy: ENFORCED (default-src 'self'; ...)
+    [+] Referrer-Policy:        strict-origin-when-cross-origin
+    [+] Server Banner:          SecureShop-Production
+
+[*] 5F. Retesting /debug/error in Secure Mode...
+    -> Server Response: HTTP 500
+    [+] DEFENSE VERIFIED: Stack trace silenced; returned sanitized 500 Internal Error page!
+
+===========================================================================
+  PHASE 6: ASSESSMENT AUDIT SUMMARY & CONCLUSION
+===========================================================================
+  [+] ASSESSMENT VERDICT: 100% REMEDIATION PASS RATE
+
+  -------------------------------------------------------------------------
+  Vulnerability                      Vulnerable Mode    Remediated Mode
+  -------------------------------------------------------------------------
+  A01 IDOR Profile (/profile/3)      EXPLOITED (200)    BLOCKED (403)
+  A01 IDOR Orders (/order/102)       EXPLOITED (200)    BLOCKED (403)
+  A01 Admin Bypass (/admin/*)        EXPLOITED (200)    BLOCKED (403)
+  A03 SQL Injection (/search?q=)     EXPLOITED (All)    NEUTRALIZED (0)
+  A05 Debug Mode (/debug/error)      LEAKED TRACEBACK   SANITIZED (500)
+  A05 Security Headers               MISSING (4)        ENFORCED (All)
+  A07 Cookie Security                NO HTTPONLY/SAMESITE HttpOnly + Lax
+  -------------------------------------------------------------------------

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" style="background:#0f172a;font-family:Segoe UI, Arial, sans-serif;">
+  <rect width="800" height="420" fill="#0f172a"/>
+  <text x="400" y="35" fill="#38bdf8" font-size="20" font-weight="bold" text-anchor="middle">SecureShop Security Architecture &amp; Assessment Pipeline</text>
+  <text x="400" y="60" fill="#94a3b8" font-size="13" text-anchor="middle">BUILD &rarr; EXPOSE &rarr; SCAN (OWASP ZAP) &rarr; INVESTIGATE &rarr; SAFELY VALIDATE &rarr; FIX &rarr; RETEST</text>
+  
+  <!-- Vulnerable Box -->
+  <rect x="50" y="90" width="320" height="280" rx="10" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+  <text x="210" y="120" fill="#f87171" font-size="16" font-weight="bold" text-anchor="middle">VULNERABLE STATE (Baseline)</text>
+  <text x="70" y="150" fill="#fca5a5" font-size="13">&bull; A01: IDOR (/profile/2 &rarr; /profile/3)</text>
+  <text x="70" y="180" fill="#fca5a5" font-size="13">&bull; A01: BFLA (/admin/dashboard accessible)</text>
+  <text x="70" y="210" fill="#fca5a5" font-size="13">&bull; A03: SQLi (' OR '1'='1 in /search?q=)</text>
+  <text x="70" y="240" fill="#fca5a5" font-size="13">&bull; A05: Debug=True, Missing Headers</text>
+  <text x="70" y="270" fill="#fca5a5" font-size="13">&bull; A06: Werkzeug 2.2.2 (CVE-2023-30861)</text>
+  <text x="70" y="300" fill="#fca5a5" font-size="13">&bull; A07: Plaintext Passwords &amp; Cookie Flags</text>
+  <text x="70" y="330" fill="#fca5a5" font-size="13">&bull; A09: Plaintext Credential Logging</text>
+
+  <!-- Arrow -->
+  <path d="M 380 230 L 420 230" stroke="#38bdf8" stroke-width="4"/>
+  <text x="400" y="215" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">REMEDIATE</text>
+  <text x="400" y="255" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">&amp; RETEST</text>
+
+  <!-- Remediated Box -->
+  <rect x="430" y="90" width="320" height="280" rx="10" fill="#1e293b" stroke="#22c55e" stroke-width="2"/>
+  <text x="590" y="120" fill="#4ade80" font-size="16" font-weight="bold" text-anchor="middle">FIXED STATE (Remediated)</text>
+  <text x="450" y="150" fill="#86efac" font-size="13">&bull; A01: Strict Ownership Checks (403)</text>
+  <text x="450" y="180" fill="#86efac" font-size="13">&bull; A01: RBAC Enforcement for Admin (403)</text>
+  <text x="450" y="210" fill="#86efac" font-size="13">&bull; A03: Parameterized SQL Queries (?)</text>
+  <text x="450" y="240" fill="#86efac" font-size="13">&bull; A05: Debug=False, CSP, X-Frame-Options</text>
+  <text x="450" y="270" fill="#86efac" font-size="13">&bull; A06: Werkzeug 3.1.3+, Jinja2 3.1.6+</text>
+  <text x="450" y="300" fill="#86efac" font-size="13">&bull; A07: Salted scrypt/PBKDF2 Hashes</text>
+  <text x="450" y="330" fill="#86efac" font-size="13">&bull; A09: security.log Structured Auditing</text>
+  
+  <text x="400" y="400" fill="#64748b" font-size="12" text-anchor="middle">SecureShop Lab Assessment - Strictly Local Target http://127.0.0.1:5000</text>
+</svg>

@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Sensitive local tokens or environment variables
+.env
+.env.local
+
+# Operating system artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs (keep structured logs directory if needed, ignore large raw logs)
+*.log
+!fixed/security.log

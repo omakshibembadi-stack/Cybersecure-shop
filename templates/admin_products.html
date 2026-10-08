@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-box-seam text-primary me-2"></i>Product Inventory Management</h2>
+        <p class="text-muted mb-0">Add, view, or remove products from the SecureShop inventory.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Admin Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Add Product Form -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold py-3">
+                <i class="bi bi-plus-circle me-1"></i> Add New Product
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin.add_product') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Product Name</label>
+                        <input type="text" name="name" class="form-control form-control-sm" required placeholder="e.g. YubiKey 5C NFC">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Category</label>
+                        <select name="category" class="form-select form-select-sm" required>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Peripherals">Peripherals</option>
+                            <option value="Storage">Storage</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Price ($)</label>
+                            <input type="number" step="0.01" name="price" class="form-control form-control-sm" required placeholder="49.99">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Stock</label>
+                            <input type="number" name="stock" class="form-control form-control-sm" value="50" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Description</label>
+                        <textarea name="description" class="form-control form-control-sm" rows="3" required placeholder="Product specifications and features..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100 py-2 fw-semibold">
+                        <i class="bi bi-save me-1"></i> Add Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Listing Table -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light fw-bold py-3 d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list-check me-1"></i> Current Inventory List</span>
+                <span class="badge bg-secondary">{{ products|length }} Products</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th class="text-end pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td class="ps-3 fw-bold">#{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td><span class="badge bg-secondary">{{ product.category }}</span></td>
+                            <td class="fw-bold text-primary">${{ "%.2f"|format(product.price) }}</td>
+                            <td>{{ product.stock }}</td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('admin.delete_product', product_id=product.id) }}" class="btn btn-sm btn-outline-danger btn-delete-confirm" data-name="{{ product.name }}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

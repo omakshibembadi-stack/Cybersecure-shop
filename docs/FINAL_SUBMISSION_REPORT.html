@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Security & Red Team Assessment Report - SecureShop</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --danger: #b91c1c;
+            --success: #15803d;
+            --warning: #b45309;
+            --dark: #0f172a;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #334155;
+            --heading: #0f172a;
+        }
+        @media print {
+            body { font-size: 11pt; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #ffffff;
+            padding: 3rem 4rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+        }
+        h1, h2, h3, h4, h5 {
+            color: var(--heading);
+            font-weight: 700;
+        }
+        h1 {
+            font-size: 2.2rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .meta-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 1.2rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+        .meta-box table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .meta-box td {
+            padding: 4px 8px;
+            font-size: 0.95rem;
+        }
+        .meta-box td.label {
+            font-weight: 600;
+            width: 25%;
+            color: var(--dark);
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .badge-danger { background-color: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
+        .badge-success { background-color: #dcfce7; color: var(--success); border: 1px solid #86efac; }
+        .badge-warning { background-color: #fef3c7; color: var(--warning); border: 1px solid #fde047; }
+        .badge-primary { background-color: #dbeafe; color: var(--primary); border: 1px solid #93c5fd; }
+        
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+            font-size: 0.92rem;
+        }
+        table.data-table th, table.data-table td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+        table.data-table th {
+            background-color: #f8fafc;
+            color: var(--heading);
+            font-weight: 600;
+        }
+        table.data-table tr:nth-child(even) {
+            background-color: #fcfcfd;
+        }
+        
+        .finding-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.8rem;
+            background-color: #ffffff;
+        }
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .finding-field {
+            margin-bottom: 0.8rem;
+        }
+        .finding-field .field-title {
+            font-weight: 700;
+            color: var(--heading);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        
+        pre, code {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.88rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #d946ef;
+        }
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 0.8rem 0;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        
+        .callout {
+            border-left: 4px solid var(--primary-light);
+            background-color: #eff6ff;
+            padding: 1rem;
+            margin: 1.2rem 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+        .callout-warning {
+            border-left-color: var(--warning);
+            background-color: #fffbeb;
+        }
+        .print-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            float: right;
+            margin-top: -10px;
+        }
+        .print-btn:hover {
+            background: var(--primary-light);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
+
+    <h1>Red Team / Application Security Assessment Report</h1>
+    
+    <div class="meta-box">
+        <table>
+            <tr>
+                <td class="label">Project Title:</td>
+                <td><strong>SecureShop Security Assessment Laboratory</strong></td>
+                <td class="label">Date:</td>
+                <td>October 1, 2026</td>
+            </tr>
+            <tr>
+                <td class="label">Methodology:</td>
+                <td>Build &rarr; Attack &rarr; Identify &rarr; Fix &rarr; Retest</td>
+                <td class="label">Scope:</td>
+                <td>Local Environment Only (<code>http://127.0.0.1:8080</code>)</td>
+            </tr>
+            <tr>
+                <td class="label">Assessment Tool:</td>
+                <td>OWASP ZAP (Zed Attack Proxy)</td>
+                <td class="label">Language & Stack:</td>
+                <td>Python, Flask, SQLite, HTML5, CSS3, JavaScript</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <p>
+        This laboratory assessment report documents the end-to-end security audit, penetration testing, and defense-in-depth remediation of <strong>SecureShop</strong>, an e-commerce web application. The target was evaluated against four core vulnerability categories from the <strong>OWASP Top 10:2021</strong> framework and evaluated for outdated dependencies.
+    </p>
+    <p>
+        The assessment proved that insecure baseline development patterns allowed unauthorized privilege escalation, database exfiltration, and session manipulation. Subsequent engineering fixes—including input parameterization, strict server-side role enforcement, cryptographic hashing, and modern security headers—successfully neutralized all findings, confirmed via automated unit tests and DAST verification.
+    </p>
+
+    <h2>2. System Architecture</h2>
+    <p>The application implements a modular three-tier architecture running locally on port 8080:</p>
+    <pre><code>Client Browser &lt;=== HTTP Requests / Cookies ===&gt; Flask Application &lt;=== SQLite Queries ===&gt; database.db</code></pre>
+    <p><strong>Primary Modules:</strong></p>
+    <ul>
+        <li><strong>Public Services:</strong> Catalogue browsing, real-time item search, and product specifications.</li>
+        <li><strong>Authentication:</strong> User registration, login verification, and session lifecycle.</li>
+        <li><strong>Customer Services:</strong> Shopping cart, multi-item checkout, personal profile, and order receipts.</li>
+        <li><strong>Administrative Portal:</strong> Privilege-restricted inventory manager, system dashboard, and user accounts directory.</li>
+    </ul>
+
+    <h2>3. Vulnerability Findings & Investigation</h2>
+
+    <!-- Finding 1 -->
+    <div class="finding-card">
+        <div class="finding-header">
+            <div>
+                <h3 style="margin:0;">Finding 1: Broken Function Level Authorization & IDOR</h3>
+                <small>OWASP Category: <strong>A01:2021 &ndash; Broken Access Control</strong></small>
+            </div>
+            <span class="badge badge-danger">High Severity</span>
+        </div>
+
+        <div class="finding-field">
+            <div class="field-title">Affected URL & Functionality</div>
+            <code>http://127.0.0.1:8080/admin/dashboard</code>, <code>/admin/products</code>, <code>/admin/users</code>, <code>/order/&lt;id&gt;</code>
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHAT? (Vulnerability Description)</div>
+            In vulnerable mode, the server only verifies that an active session exists (<code>'user_id' in session</code>), failing to verify administrative role privileges. Standard customer accounts can access administrative controls and view/modify other users' profiles and private invoices.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHERE? (Code Location)</div>
+            <code>routes/admin.py</code> (in <code>enforce_admin_check()</code>) and <code>routes/user.py</code> (in <code>profile()</code> and <code>order_detail()</code>).
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHY? (Root Cause)</div>
+            Missing server-side role validation and lack of authorization ownership checks prior to rendering privileged views.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">IMPACT</div>
+            Privilege escalation from normal customer to site administrator, unauthorized deletion of inventory, and confidentiality breach of customer addresses.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">EVIDENCE</div>
+            Logging in as standard user <code>alice</code> and navigating directly to <code>/admin/dashboard</code> successfully returns HTTP 200 OK and renders the admin console. Navigating to <code>/order/102</code> renders customer Bob's private home delivery address.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">REMEDIATION</div>
+            Enforce role verification <code>if session.get("role") != "admin": abort(403)</code> on all admin endpoints, and verify record ownership on user resources.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">RETEST</div>
+            In secure mode, access attempts by non-admin users consistently return <strong>HTTP 403 Forbidden</strong>.
+        </div>
+    </div>
+
+    <!-- Finding 2 -->
+    <div class="finding-card">
+        <div class="finding-header">
+            <div>
+                <h3 style="margin:0;">Finding 2: Unsanitized SQL Query Construction (SQL Injection)</h3>
+                <small>OWASP Category: <strong>A03:2021 &ndash; Injection</strong></small>
+            </div>
+            <span class="badge badge-danger">High Severity</span>
+        </div>
+
+        <div class="finding-field">
+            <div class="field-title">Affected URL & Functionality</div>
+            <code>http://127.0.0.1:8080/search?q=&lt;payload&gt;</code> (Product Catalogue Search)
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHAT? (Vulnerability Description)</div>
+            The search functionality interpolates raw user input into an SQL query string via string formatting without parameter binding, permitting arbitrary SQLite command execution.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHERE? (Code Location)</div>
+            <code>routes/public.py</code> in the <code>search()</code> function.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHY? (Root Cause)</div>
+            Dynamic SQL query assembly using Python f-strings instead of prepared statements.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">IMPACT</div>
+            Extraction of the complete SQLite database contents (including account credentials, order history, and private user details) via UNION-based attacks.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">EVIDENCE</div>
+            Submitting <code>' OR '1'='1</code> returns all store products. Submitting <code>' UNION SELECT id, username, email, password, role, bio, created_at FROM users--</code> dumps all user records into the search results page.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">REMEDIATION</div>
+            Implemented parameterized SQL queries using SQLite positional placeholders (<code>?</code>):
+            <pre><code>cursor.execute("SELECT * FROM products WHERE name LIKE ? OR description LIKE ?", (f"%{query}%", f"%{query}%"))</code></pre>
+        </div>
+        <div class="finding-field">
+            <div class="field-title">RETEST</div>
+            Submitting injection payloads in secure mode safely returns zero results without syntax errors; input is treated strictly as literal strings.
+        </div>
+    </div>
+
+    <!-- Finding 3 -->
+    <div class="finding-card">
+        <div class="finding-header">
+            <div>
+                <h3 style="margin:0;">Finding 3: Debug Mode Active & Missing HTTP Defensive Headers</h3>
+                <small>OWASP Category: <strong>A05:2021 &ndash; Security Misconfiguration</strong></small>
+            </div>
+            <span class="badge badge-warning">Medium Severity</span>
+        </div>
+
+        <div class="finding-field">
+            <div class="field-title">Affected URL & Functionality</div>
+            <code>http://127.0.0.1:8080/debug/error</code> and all HTTP response headers.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHAT? (Vulnerability Description)</div>
+            Flask's interactive Werkzeug debugger was enabled (<code>debug=True</code>), exposing source code, local filesystem paths, and environment frames upon unhandled errors. Defensive HTTP headers (<code>X-Frame-Options</code>, <code>X-Content-Type-Options</code>, <code>Content-Security-Policy</code>) were missing.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHERE? (Code Location)</div>
+            <code>config.py</code> (<code>VulnerableConfig.DEBUG = True</code>) and <code>app.py</code> (<code>apply_security_headers()</code>).
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHY? (Root Cause)</div>
+            Development convenience flags left active in runtime environments.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">IMPACT</div>
+            Information disclosure aiding attacker reconnaissance; vulnerability to Clickjacking and MIME-type confusion attacks.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">EVIDENCE</div>
+            Navigating to <code>/debug/error</code> exposes the full interactive Werkzeug traceback. Response headers lack <code>X-Frame-Options</code> and expose <code>Server: Werkzeug/2.2.2 Python/3.14</code>.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">REMEDIATION</div>
+            Disabled debug mode (<code>DEBUG = False</code>), added generic error handlers (403, 404, 500), and enforced strict HTTP response headers (<code>X-Frame-Options: DENY</code>, <code>X-Content-Type-Options: nosniff</code>, <code>Content-Security-Policy</code>).
+        </div>
+        <div class="finding-field">
+            <div class="field-title">RETEST</div>
+            Errors return a clean generic page without stack traces; headers verified via curl and DevTools.
+        </div>
+    </div>
+
+    <!-- Finding 4 -->
+    <div class="finding-card">
+        <div class="finding-header">
+            <div>
+                <h3 style="margin:0;">Finding 4: Plaintext Password Storage & Insecure Session Attributes</h3>
+                <small>OWASP Category: <strong>A07:2021 &ndash; Identification and Authentication Failures</strong></small>
+            </div>
+            <span class="badge badge-warning">Medium Severity</span>
+        </div>
+
+        <div class="finding-field">
+            <div class="field-title">Affected URL & Functionality</div>
+            <code>http://127.0.0.1:8080/register</code>, <code>/login</code>, and session cookie lifecycle.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHAT? (Vulnerability Description)</div>
+            Passphrases were saved in the SQLite database in raw cleartext. The session key was a static hardcoded string. Session cookies omitted <code>HttpOnly</code> and <code>SameSite</code> attributes, and sessions were not cleared on login (Session Fixation).
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHERE? (Code Location)</div>
+            <code>config.py</code> and <code>routes/auth.py</code>.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">WHY? (Root Cause)</div>
+            Omission of modern password hashing libraries and secure cookie flag directives.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">IMPACT</div>
+            Instant credential compromise if the database is read; exposure of session cookies to client-side JavaScript theft via XSS.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">EVIDENCE</div>
+            Direct database inspection shows plain password strings. Executing <code>console.log(document.cookie)</code> in browser DevTools successfully displays the session identifier.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">REMEDIATION</div>
+            Implemented salted one-way password hashing (<code>scrypt</code> / <code>PBKDF2</code>), dynamic 256-bit secret keys (<code>secrets.token_hex(32)</code>), <code>SESSION_COOKIE_HTTPONLY = True</code>, <code>SESSION_COOKIE_SAMESITE = 'Lax'</code>, and <code>session.clear()</code> on authentication.
+        </div>
+        <div class="finding-field">
+            <div class="field-title">RETEST</div>
+            New registrations store hashes beginning with <code>scrypt:</code>; session cookies cannot be read via JavaScript.
+        </div>
+    </div>
+
+    <h2>4. Outdated Component Analysis (A06:2021)</h2>
+    <table class="data-table">
+        <tr>
+            <th>Component Name</th>
+            <td><code>Werkzeug</code> (WSGI web utility library underpinning Flask)</td>
+        </tr>
+        <tr>
+            <th>Baseline Version Used</th>
+            <td><code>2.2.2</code> (Intentionally pinned in baseline)</td>
+        </tr>
+        <tr>
+            <th>Current Patched Version</th>
+            <td><code>3.1.9</code></td>
+        </tr>
+        <tr>
+            <th>Security Advisory / CVE</th>
+            <td><strong>CVE-2023-30861</strong> (CVSS v3.1: 7.5 High)</td>
+        </tr>
+        <tr>
+            <th>Risk Description</th>
+            <td>
+                In Werkzeug &lt; 2.2.3, responses that set cookies without explicit caching headers omit the <code>Vary: Cookie</code> HTTP header. Downstream shared caches (CDNs, reverse proxies) cache the <code>Set-Cookie</code> header and deliver it to subsequent users, resulting in unauthorized account takeover.
+            </td>
+        </tr>
+        <tr>
+            <th>Remediation Path</th>
+            <td>Upgraded requirement specification to <code>Werkzeug &gt;= 3.1.9</code>.</td>
+        </tr>
+    </table>
+
+    <h2>5. Remediation Comparison Matrix</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Vulnerability Category</th>
+                <th>Baseline State</th>
+                <th>Fix Applied</th>
+                <th>Remediated State</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Broken Access Control (A01)</strong></td>
+                <td><span class="badge badge-danger">Vulnerable</span></td>
+                <td>Role-Based Access Control & Object Ownership Checks</td>
+                <td><span class="badge badge-success">Fixed (HTTP 403)</span></td>
+            </tr>
+            <tr>
+                <td><strong>Injection (A03)</strong></td>
+                <td><span class="badge badge-danger">Vulnerable</span></td>
+                <td>Prepared / Parameterized SQLite Queries (<code>?</code>)</td>
+                <td><span class="badge badge-success">Fixed</span></td>
+            </tr>
+            <tr>
+                <td><strong>Security Misconfiguration (A05)</strong></td>
+                <td><span class="badge badge-danger">Vulnerable</span></td>
+                <td>Debug Disabled + Strict Defensive HTTP Security Headers</td>
+                <td><span class="badge badge-success">Fixed</span></td>
+            </tr>
+            <tr>
+                <td><strong>Authentication / Session (A07)</strong></td>
+                <td><span class="badge badge-danger">Vulnerable</span></td>
+                <td><code>scrypt</code> / <code>PBKDF2</code> Hashing + <code>HttpOnly</code> Cookie Flags</td>
+                <td><span class="badge badge-success">Fixed</span></td>
+            </tr>
+            <tr>
+                <td><strong>Outdated Component (A06)</strong></td>
+                <td><span class="badge badge-danger">Old Version (2.2.2)</span></td>
+                <td>Upgraded Dependency Specification (<code>&gt;= 3.1.9</code>)</td>
+                <td><span class="badge badge-success">Fixed</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>6. Automated Regression Test Suite Verification</h2>
+    <p>15 automated unit tests were executed across functional and security suites with a 100% pass rate:</p>
+    <pre><code>test_01_user_registration (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_02_user_login_and_logout (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_03_product_listing (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_04_product_search (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_05_shopping_cart (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_06_checkout_and_order_history (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_07_admin_login (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_08_admin_product_management (tests.test_functional.SecureShopFunctionalTestSuite) ... ok
+test_01_broken_access_control_idor_vulnerable_mode (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_02_broken_access_control_idor_secure_mode (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_03_broken_function_level_authorization_bfla (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_04_sql_injection_product_search (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_05_cross_site_scripting_xss (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_06_security_misconfiguration_headers (tests.test_security.SecureShopSecurityTestSuite) ... ok
+test_07_authentication_password_hashing (tests.test_security.SecureShopSecurityTestSuite) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 6.136s
+OK (All functional features verified & all security fixes confirmed)</code></pre>
+
+    <h2>7. Conclusion</h2>
+    <p>
+        The SecureShop project demonstrates the vital importance of defensive secure coding practices. By systematically identifying vulnerabilities via DAST scanning and source analysis, implementing structural remediations, and validating them with regression test suites, the application successfully transitioned from an insecure prototype to a hardened, defense-in-depth web application.
+    </p>
+</div>
+
+</body>
+</html>

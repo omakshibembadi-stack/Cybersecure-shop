@@ -1,0 +1,18 @@
+# ==============================================================================
+# SECURESHOP VULNERABLE LAB DEPENDENCIES (BASELINE)
+# WARNING: Contains intentionally pinned outdated dependencies with known CVEs
+# Used for DAST / OWASP ZAP assessment and vulnerability discovery demonstration.
+# ==============================================================================
+
+# Framework & WSGI Toolkit (A06: Outdated & Vulnerable Component)
+Flask==2.2.2
+Werkzeug==2.2.2        # Vulnerable to CVE-2023-30861 (Cookie caching / session leakage)
+Jinja2==3.1.2          # Vulnerable to CVE-2024-22195 / CVE-2024-34064 (HTML attr XSS)
+MarkupSafe==2.1.1
+itsdangerous==2.1.2
+click==8.1.3
+blinker==1.5
+
+# HTTP Client (Outdated Component)
+requests==2.28.1
+urllib3==1.26.5        # Vulnerable to CVE-2023-43804 (Cookie leakage on cross-host redirects)

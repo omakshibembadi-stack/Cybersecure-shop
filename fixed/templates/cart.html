@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="fw-bold mb-4"><i class="bi bi-cart3 text-primary me-2"></i>Your Shopping Cart</h2>
+
+{% if items %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="py-3 ps-3">Product</th>
+                            <th scope="col" class="py-3">Price</th>
+                            <th scope="col" class="py-3">Quantity</th>
+                            <th scope="col" class="py-3">Subtotal</th>
+                            <th scope="col" class="py-3 text-end pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td class="ps-3">
+                                <strong>{{ item.product.name }}</strong>
+                                <div class="small text-muted">{{ item.product.category }}</div>
+                            </td>
+                            <td>${{ "%.2f"|format(item.product.price) }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td class="fw-bold text-dark">${{ "%.2f"|format(item.subtotal) }}</td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('user.remove_from_cart', product_id=item.product.id) }}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Subtotal</span>
+                <span>${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Standard Shipping</span>
+                <span class="text-success">FREE</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4">
+                <span class="fw-bold fs-5">Total</span>
+                <span class="fw-bold fs-5 text-primary">${{ "%.2f"|format(total) }}</span>
+            </div>
+
+            {% if session.get('user_id') %}
+                <form action="{{ url_for('user.checkout') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="address" class="form-label small fw-semibold">Shipping Address</label>
+                        <textarea class="form-control form-control-sm" id="address" name="address" rows="2" placeholder="Street, City, Postal Code" required>42 Silicon Valley Way, Suite 101, San Jose, CA</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="bi bi-credit-card me-1"></i> Complete Checkout
+                    </button>
+                </form>
+            {% else %}
+                <div class="alert alert-info small mb-3">
+                    Please log in or create an account to proceed with checkout.
+                </div>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary w-100 py-2">
+                    Sign in to Checkout
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5 bg-white rounded-3 shadow-sm border p-5">
+    <div class="display-4 text-muted mb-3"><i class="bi bi-cart-x"></i></div>
+    <h3>Your shopping cart is empty</h3>
+    <p class="text-muted mb-4">Explore our catalogue to find hardware security tokens, privacy tools, and gear.</p>
+    <a href="{{ url_for('public.products') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+</div>
+{% endif %}
+{% endblock %}

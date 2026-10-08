@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-warning me-2"></i>Admin Management Console</h2>
+        <p class="text-muted mb-0">Internal SecureShop Administrative Operations & Security Monitoring</p>
+    </div>
+    <div>
+        <span class="badge {{ 'bg-danger' if session.get('role') != 'admin' else 'bg-success' }} px-3 py-2 fs-6">
+            Current User: {{ session.get('username') }} ({{ session.get('role', 'anonymous') }})
+        </span>
+    </div>
+</div>
+
+{% if current_mode == 'vulnerable' and session.get('role') != 'admin' %}
+<div class="alert alert-danger py-3 mb-4 shadow-sm">
+    <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-shield-slash-fill me-2"></i>A01: Broken Access Control (BFLA) Detected!</h5>
+    <p class="mb-0">
+        You are authenticated with role <code>{{ session.get('role') }}</code>, but have gained full access to the Administrator Console because the server failed to perform role-based authorization checks on this administrative route!
+    </p>
+</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-primary bg-opacity-10 rounded-circle text-primary me-3">
+                    <i class="bi bi-people-fill fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Registered Users</div>
+                    <h3 class="fw-bold mb-0">{{ user_count }}</h3>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary mt-3 w-100">Manage Users</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-success bg-opacity-10 rounded-circle text-success me-3">
+                    <i class="bi bi-box-seam-fill fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Catalogue Items</div>
+                    <h3 class="fw-bold mb-0">{{ product_count }}</h3>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-outline-success mt-3 w-100">Manage Products</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-warning bg-opacity-10 rounded-circle text-warning me-3">
+                    <i class="bi bi-currency-dollar fs-3"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Gross Revenue</div>
+                    <h3 class="fw-bold mb-0">${{ "%.2f"|format(total_sales) }}</h3>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-warning mt-3 w-100" disabled>Analytics (Q4)</button>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-light fw-bold py-3">
+        <i class="bi bi-journal-text me-2"></i> Administrative Quick Actions
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="border rounded p-3">
+                    <h6>Product Inventory</h6>
+                    <p class="small text-muted mb-2">Create, modify, or remove store merchandise and update inventory stock.</p>
+                    <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-primary">Go to Product Management</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border rounded p-3">
+                    <h6>User Directory & Roles</h6>
+                    <p class="small text-muted mb-2">Review customer registrations, assign role privileges, or purge accounts.</p>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-primary">Go to User Directory</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

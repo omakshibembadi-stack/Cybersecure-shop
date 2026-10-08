@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="850" height="480" viewBox="0 0 850 480" style="background:#0f172a;font-family:Segoe UI, Arial, sans-serif;">
+  <rect width="850" height="480" fill="#0f172a"/>
+  <text x="425" y="35" fill="#38bdf8" font-size="20" font-weight="bold" text-anchor="middle">OWASP ZAP 2.15.0 - DAST Security Assessment Matrix</text>
+  <text x="425" y="60" fill="#94a3b8" font-size="13" text-anchor="middle">Target: http://127.0.0.1:5000 | Baseline Scan vs. Remediated Retest Scan</text>
+
+  <!-- Table Header -->
+  <rect x="40" y="85" width="770" height="35" fill="#1e293b" rx="4"/>
+  <text x="60" y="108" fill="#94a3b8" font-size="12" font-weight="bold">CATEGORY</text>
+  <text x="140" y="108" fill="#94a3b8" font-size="12" font-weight="bold">VULNERABILITY / FINDING</text>
+  <text x="440" y="108" fill="#94a3b8" font-size="12" font-weight="bold">SEVERITY</text>
+  <text x="540" y="108" fill="#f87171" font-size="12" font-weight="bold">BEFORE (VULN)</text>
+  <text x="670" y="108" fill="#4ade80" font-size="12" font-weight="bold">AFTER (FIXED)</text>
+
+  <!-- Row 1: SQLi -->
+  <rect x="40" y="125" width="770" height="42" fill="#1e293b" opacity="0.6"/>
+  <text x="60" y="151" fill="#fca5a5" font-size="12" font-weight="bold">A03:2021</text>
+  <text x="140" y="151" fill="#e2e8f0" font-size="12">SQL Injection (/search?q=)</text>
+  <rect x="440" y="137" width="55" height="20" rx="3" fill="#ef4444"/>
+  <text x="467" y="151" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">HIGH</text>
+  <text x="555" y="151" fill="#ef4444" font-size="12" font-weight="bold">FLAGGED (Alert)</text>
+  <text x="685" y="151" fill="#22c55e" font-size="12" font-weight="bold">CLEARED (0)</text>
+
+  <!-- Row 2: IDOR -->
+  <rect x="40" y="172" width="770" height="42" fill="#1e293b" opacity="0.3"/>
+  <text x="60" y="198" fill="#fca5a5" font-size="12" font-weight="bold">A01:2021</text>
+  <text x="140" y="198" fill="#e2e8f0" font-size="12">Broken Access Control (IDOR /profile &amp; /order)</text>
+  <rect x="440" y="184" width="55" height="20" rx="3" fill="#ef4444"/>
+  <text x="467" y="198" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">HIGH</text>
+  <text x="555" y="198" fill="#ef4444" font-size="12" font-weight="bold">CONFIRMED</text>
+  <text x="685" y="198" fill="#22c55e" font-size="12" font-weight="bold">BLOCKED (403)</text>
+
+  <!-- Row 3: Admin BFLA -->
+  <rect x="40" y="219" width="770" height="42" fill="#1e293b" opacity="0.6"/>
+  <text x="60" y="245" fill="#fca5a5" font-size="12" font-weight="bold">A01:2021</text>
+  <text x="140" y="245" fill="#e2e8f0" font-size="12">Broken Function Authorization (/admin/*)</text>
+  <rect x="440" y="231" width="55" height="20" rx="3" fill="#ef4444"/>
+  <text x="467" y="245" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">HIGH</text>
+  <text x="555" y="245" fill="#ef4444" font-size="12" font-weight="bold">CONFIRMED</text>
+  <text x="685" y="245" fill="#22c55e" font-size="12" font-weight="bold">RBAC ENFORCED</text>
+
+  <!-- Row 4: Security Headers & CSP -->
+  <rect x="40" y="266" width="770" height="42" fill="#1e293b" opacity="0.3"/>
+  <text x="60" y="292" fill="#fdba74" font-size="12" font-weight="bold">A05:2021</text>
+  <text x="140" y="292" fill="#e2e8f0" font-size="12">Missing Headers (CSP, X-Frame, nosniff)</text>
+  <rect x="440" y="278" width="55" height="20" rx="3" fill="#f97316"/>
+  <text x="467" y="292" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">MEDIUM</text>
+  <text x="555" y="292" fill="#ef4444" font-size="12" font-weight="bold">FLAGGED (4)</text>
+  <text x="685" y="292" fill="#22c55e" font-size="12" font-weight="bold">RESOLVED (All)</text>
+
+  <!-- Row 5: Outdated Component -->
+  <rect x="40" y="313" width="770" height="42" fill="#1e293b" opacity="0.6"/>
+  <text x="60" y="339" fill="#fde047" font-size="12" font-weight="bold">A06:2021</text>
+  <text x="140" y="339" fill="#e2e8f0" font-size="12">Vulnerable Component (Werkzeug 2.2.2)</text>
+  <rect x="440" y="325" width="55" height="20" rx="3" fill="#eab308"/>
+  <text x="467" y="339" fill="#000000" font-size="10" font-weight="bold" text-anchor="middle">MEDIUM</text>
+  <text x="555" y="339" fill="#ef4444" font-size="12" font-weight="bold">CVE-2023-30861</text>
+  <text x="685" y="339" fill="#22c55e" font-size="12" font-weight="bold">UPGRADED 3.1+</text>
+
+  <!-- Row 6: Cookie Flags & Hashing -->
+  <rect x="40" y="360" width="770" height="42" fill="#1e293b" opacity="0.3"/>
+  <text x="60" y="386" fill="#fdba74" font-size="12" font-weight="bold">A07:2021</text>
+  <text x="140" y="386" fill="#e2e8f0" font-size="12">Insecure Session Cookie &amp; Plaintext Pw</text>
+  <rect x="440" y="372" width="55" height="20" rx="3" fill="#f97316"/>
+  <text x="467" y="386" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">MEDIUM</text>
+  <text x="555" y="386" fill="#ef4444" font-size="12" font-weight="bold">FLAGGED (Alert)</text>
+  <text x="685" y="386" fill="#22c55e" font-size="12" font-weight="bold">HttpOnly/Lax/Hash</text>
+
+  <!-- Summary Box -->
+  <rect x="40" y="415" width="770" height="45" fill="#1e293b" rx="6" stroke="#38bdf8" stroke-width="1"/>
+  <text x="60" y="442" fill="#38bdf8" font-size="13" font-weight="bold">DAST VERIFICATION SUMMARY:</text>
+  <text x="260" y="442" fill="#e2e8f0" font-size="13">Baseline Alerts: <tspan fill="#f87171" font-weight="bold">7 Alerts (3 High, 3 Med, 1 Low)</tspan> &rarr; Retest Alerts: <tspan fill="#4ade80" font-weight="bold">0 Actionable Vulnerabilities</tspan></text>
+</svg>
